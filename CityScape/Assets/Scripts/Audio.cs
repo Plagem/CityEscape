@@ -1,0 +1,62 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.UI;
+
+public class Audio : MonoBehaviour
+{
+    [SerializeField] private AudioMixer audioMixer;
+    [SerializeField] private Slider sliderBgm;
+    [SerializeField] private Slider sliderSFX;
+    public static Audio instance = null;
+    private void Awake()
+    {
+        if(instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else 
+        {
+            Destroy(gameObject);
+        }
+
+        
+
+        if (PlayerPrefs.HasKey("bgm"))
+        {
+            sliderBgm.value = PlayerPrefs.GetFloat("bgm");
+        }
+        else
+        {
+            sliderBgm.value = 0.75f;
+        }
+
+        if (PlayerPrefs.HasKey("sfx"))
+        {
+            sliderSFX.value = PlayerPrefs.GetFloat("sfx");
+        }
+        else
+        {
+            sliderSFX.value = 0.75f;
+        }
+    }
+    private void Start()
+    { 
+        sliderBgm.onValueChanged.AddListener(SetBgmVolume);
+        sliderSFX.onValueChanged.AddListener(SetSFXVolume);
+    }
+
+    
+    public void SetBgmVolume(float volume)
+    {
+        audioMixer.SetFloat("bgm", Mathf.Log10(volume) * 20);
+        PlayerPrefs.SetFloat("bgm", volume);
+    }
+    public void SetSFXVolume(float volume)
+    {
+        audioMixer.SetFloat("sfx", Mathf.Log10(volume) * 20);
+        PlayerPrefs.SetFloat("sfx", volume);
+    }
+}
